@@ -12,7 +12,7 @@ export const {
 } = appHooks;
 
 export const handleSaveClicked = ({
-  dispatch, getContent, validateEntry,
+  dispatch, getContent, validateEntry, onClose,
 }) => {
   const destination = useSelector(selectors.app.returnUrl);
   const analytics = useSelector(selectors.app.analytics);
