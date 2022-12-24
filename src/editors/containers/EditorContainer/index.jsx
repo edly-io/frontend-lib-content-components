@@ -1,6 +1,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 
 import { Icon, ModalDialog, IconButton } from '@edx/paragon';
 import { Close } from '@edx/paragon/icons';
@@ -14,6 +15,7 @@ export const EditorContainer = ({
   getContent,
   onClose,
   validateEntry,
+  shouldGreyoutHeader,
 }) => {
   const dispatch = useDispatch();
   const isInitialized = hooks.isInitialized();
@@ -22,7 +24,7 @@ export const EditorContainer = ({
 
   return (
     <div>
-      <ModalDialog.Header className="shadow-sm zindex-10">
+      <ModalDialog.Header className={("shadow-sm", {"zindex-10": !shouldGreyoutHeader})}>
         <ModalDialog.Title>
           <div
             style={{ height: '44px', margin: 'auto' }}
@@ -53,12 +55,14 @@ export const EditorContainer = ({
 EditorContainer.defaultProps = {
   onClose: null,
   validateEntry: null,
+  shouldGreyoutHeader: true,
 };
 EditorContainer.propTypes = {
   children: PropTypes.node.isRequired,
   getContent: PropTypes.func.isRequired,
   onClose: PropTypes.func,
   validateEntry: PropTypes.func,
+  shouldGreyoutHeader: PropTypes.bool,
 };
 
 export default EditorContainer;
