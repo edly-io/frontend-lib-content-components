@@ -61,12 +61,14 @@ export class OLXParser {
       });
     } else {
       const feedback = this.getAnswerFeedback(choice, `${option}hint`);
-      answers.push({
-        title: choice['#text'],
-        correct: eval(choice['@_correct'].toLowerCase()),
-        id: indexToLetterMap[answers.length],
-        ...feedback,
-      });
+      if (choice) {
+        answers.push({
+          title: choice['#text'],
+          correct: eval(choice['@_correct'].toLowerCase()),
+          id: indexToLetterMap[answers.length],
+          ...feedback,
+        });
+      }
     }
     data = { answers };
     const groupFeedbackList = this.getGroupedFeedback(widget);

@@ -151,7 +151,6 @@ describe('TextEditor hooks', () => {
       });
       test('It configures plugins and toolbars correctly', () => {
         expect(output.init.plugins).toEqual(pluginConfig(props.isLibrary).plugins);
-        expect(output.init.imagetools_toolbar).toEqual(pluginConfig(props.isLibrary).imageToolbar);
         expect(output.init.toolbar).toEqual(pluginConfig(props.isLibrary).toolbar);
         Object.keys(pluginConfig(props.isLibrary).config).forEach(key => {
           expect(output.init[key]).toEqual(pluginConfig(props.isLibrary).config[key]);

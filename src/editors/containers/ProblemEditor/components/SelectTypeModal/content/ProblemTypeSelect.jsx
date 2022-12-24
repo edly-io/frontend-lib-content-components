@@ -22,7 +22,7 @@ export const ProblemTypeSelect = ({
         value={selected}
       >
         {Object.values(ProblemTypeKeys).map((key) => (
-          key !== 'advanced'
+          key !== 'advanced' && key !== ProblemTypeKeys.NUMERIC
             ? (
               <SelectableBox id={key} value={key} {...settings}>
                 {ProblemTypes[key].title}
@@ -31,7 +31,7 @@ export const ProblemTypeSelect = ({
             : null
         ))}
       </SelectableBox.Set>
-      <Button variant="link" className="pl-0 mt-2" onClick={handleClick}>
+      <Button variant="link" className="pl-0 mt-2 d-none" onClick={handleClick}>
         <FormattedMessage {...messages.advanceProblemButtonLabel} />
       </Button>
     </>

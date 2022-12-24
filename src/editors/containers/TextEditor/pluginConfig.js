@@ -4,10 +4,6 @@ import { buttons, plugins } from '../../data/constants/tinyMCE';
 const mapToolbars = toolbars => toolbars.map(toolbar => toolbar.join(' ')).join(' | ');
 
 const pluginConfig = (isLibrary) => {
-  const image = isLibrary ? '' : plugins.image;
-  const imageTools = isLibrary ? '' : plugins.imagetools;
-  const imageUploadButton = isLibrary ? '' : buttons.imageUploadButton;
-  const editImageSettings = isLibrary ? '' : buttons.editImageSettings;
 
   return (
     StrictDict({
@@ -21,8 +17,6 @@ const pluginConfig = (isLibrary) => {
         plugins.charmap,
         plugins.code,
         plugins.autoresize,
-        image,
-        imageTools,
       ].join(' '),
       menubar: false,
       toolbar: mapToolbars([
@@ -41,14 +35,8 @@ const pluginConfig = (isLibrary) => {
           buttons.outdent,
           buttons.indent,
         ],
-        [imageUploadButton, buttons.link, buttons.unlink, buttons.blockQuote, buttons.codeBlock],
         [buttons.table, buttons.emoticons, buttons.charmap, buttons.hr],
         [buttons.removeFormat, buttons.code],
-      ]),
-      imageToolbar: mapToolbars([
-        // [buttons.rotate.left, buttons.rotate.right],
-        // [buttons.flip.horiz, buttons.flip.vert],
-        [editImageSettings],
       ]),
       config: {
         branding: false,
