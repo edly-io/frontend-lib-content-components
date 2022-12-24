@@ -100,7 +100,6 @@ export const editorConfig = ({
   openSourceCodeModal,
   setEditorRef,
   setSelection,
-  studioEndpointUrl,
   images,
   isLibrary,
 }) => ({
