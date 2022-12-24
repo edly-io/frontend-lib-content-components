@@ -18,6 +18,8 @@ export const EditorContainer = ({
   const dispatch = useDispatch();
   const isInitialized = hooks.isInitialized();
   const handleCancelClicked = hooks.handleCancelClicked({ onClose });
+  const isSaving= hooks.savePending();
+
   return (
     <div>
       <ModalDialog.Header className="shadow-sm zindex-10">
@@ -40,9 +42,9 @@ export const EditorContainer = ({
       <EditorFooter
         onCancel={handleCancelClicked}
         onSave={hooks.handleSaveClicked({
-          dispatch, getContent, validateEntry,
+          dispatch, getContent, validateEntry, onClose,
         })}
-        disableSave={!isInitialized}
+        disableSave={!isInitialized || isSaving}
         saveFailed={hooks.saveFailed()}
       />
     </div>
