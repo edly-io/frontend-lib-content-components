@@ -87,13 +87,13 @@ export const TextEditor = ({
     );
   };
 
-  const shouldGreyoutHeader= isSourceCodeOpen || isImgOpen;
+  const shouldGreyoutHeader = isSourceCodeOpen || isImgOpen;
 
   return (
     <EditorContainer
       getContent={hooks.getContent({ editorRef, isRaw, assets })}
       onClose={onClose}
-      shouldGreyoutHeader= {shouldGreyoutHeader}
+      shouldGreyoutHeader={shouldGreyoutHeader}
     >
       <div className="editor-body h-75 overflow-auto">
         {isLibrary ? null : (
