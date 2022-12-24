@@ -13,13 +13,14 @@ export const TypeCard = ({
   intl,
 }) => {
   const problemTypeKeysArray = Object.values(ProblemTypeKeys);
+  const filterBlocks = [ProblemTypeKeys.NUMERIC, ProblemTypeKeys.ADVANCED];
 
   return (
     <SettingsOption
       title={intl.formatMessage(messages.typeSettingTitle)}
       summary={ProblemTypes[problemType].title}
     >
-      {problemTypeKeysArray.map((typeKey, i) => (
+      {problemTypeKeysArray.filter(type => !filterBlocks.includes(type)).map((typeKey, i) => (
         <TypeRow
           key={typeKey}
           typeKey={typeKey}

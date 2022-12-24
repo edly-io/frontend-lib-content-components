@@ -29,6 +29,9 @@ export const prepareEditorRef = () => {
   const editorRef = useRef(null);
   const setEditorRef = useCallback((ref) => {
     editorRef.current = ref;
+    editorRef.current.addShortcut('meta+i', '', '');
+    editorRef.current.addShortcut('meta+b', '', '');
+    editorRef.current.addShortcut('meta+u', '', '');
   }, []);
   const [refReady, setRefReady] = module.state.refReady(false);
   useEffect(() => setRefReady(true), [setRefReady]);

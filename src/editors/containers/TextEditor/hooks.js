@@ -117,8 +117,6 @@ export const editorConfig = ({
     contextmenu: 'link table',
     document_base_url: lmsEndpointUrl,
     init_instance_callback: module.checkRelativeUrl(module.fetchImageUrls(images)),
-    imagetools_cors_hosts: [removeProtocolFromUrl(lmsEndpointUrl), removeProtocolFromUrl(studioEndpointUrl)],
-    imagetools_toolbar: pluginConfig(isLibrary).imageToolbar,
     plugins: pluginConfig(isLibrary).plugins,
     setup: module.setupCustomBehavior({
       openImgModal,
