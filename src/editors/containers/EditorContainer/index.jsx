@@ -18,7 +18,7 @@ export const EditorContainer = ({
   const dispatch = useDispatch();
   const isInitialized = hooks.isInitialized();
   const handleCancelClicked = hooks.handleCancelClicked({ onClose });
-  const isSaving= hooks.savePending();
+  const isSaving = hooks.savePending();
 
   return (
     <div>

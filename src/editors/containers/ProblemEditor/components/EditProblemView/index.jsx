@@ -14,6 +14,7 @@ import ReactStateOLXParser from '../../data/ReactStateOLXParser';
 export const EditProblemView = ({
   problemType,
   problemState,
+  onClose,
 }) => {
   const parseState = (problem) => () => {
     const reactSettingsParser = new ReactStateSettingsParser(problem);
@@ -24,7 +25,7 @@ export const EditProblemView = ({
     };
   };
   return (
-    <EditorContainer getContent={parseState(problemState)}>
+    <EditorContainer getContent={parseState(problemState)} onClose={onClose}>
       <Container fluid>
         <Row>
           <Col xs={9}>
@@ -44,6 +45,11 @@ EditProblemView.propTypes = {
   problemType: PropTypes.string.isRequired,
   // eslint-disable-next-line
   problemState: PropTypes.any.isRequired,
+  onClose: PropTypes.func,
+};
+
+EditProblemView.defaultProps = {
+  onClose: () => {},
 };
 
 export const mapStateToProps = (state) => ({
