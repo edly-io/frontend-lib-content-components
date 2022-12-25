@@ -17,16 +17,20 @@ export const Editor = ({
   onClose,
 }) => {
   const dispatch = useDispatch();
-  hooks.initializeApp({
-    dispatch,
-    data: {
-      blockId,
-      blockType,
-      learningContextId,
-      lmsEndpointUrl,
-      studioEndpointUrl,
-    },
-  });
+  const data = React.useMemo(
+    () => ({
+      dispatch,
+      data: {
+        blockId,
+        blockType,
+        learningContextId,
+        lmsEndpointUrl,
+        studioEndpointUrl,
+      },
+    }),
+    [dispatch, blockId, blockType, learningContextId, lmsEndpointUrl, studioEndpointUrl],
+  );
+  hooks.initializeApp(data);
 
   const EditorComponent = supportedEditors[blockType];
   return (
