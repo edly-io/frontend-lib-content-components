@@ -249,7 +249,8 @@ class ReactStateOLXParser {
   }
 
   hasAttributeWithValue(obj, attr) {
-    return _.has(obj, attr) && _.get(obj, attr, '').trim() !== '';
+    const objAttr = _.has(obj, attr) && _.get(obj, attr, '');
+    return objAttr && objAttr.toString().trim() !== '';
   }
 
   buildOLX() {
