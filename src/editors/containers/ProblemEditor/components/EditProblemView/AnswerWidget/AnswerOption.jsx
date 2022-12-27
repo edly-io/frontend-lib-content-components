@@ -116,7 +116,7 @@ export const AnswerOption = ({
           />
         </Col>
 
-        <Col xs={10}>
+        <Col xs={9}>
           <Form.Control
             as="textarea"
             rows={1}
@@ -132,7 +132,7 @@ export const AnswerOption = ({
           </Collapsible.Body>
         </Col>
 
-        <Col xs={1} className="d-inline-flex mt-1">
+        <Col xs={2} className="d-inline-flex mt-1 justify-content-end">
           <Collapsible.Trigger>
             <IconButton
               src={AddComment}
