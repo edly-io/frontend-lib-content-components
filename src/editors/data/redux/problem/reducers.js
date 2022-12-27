@@ -132,6 +132,7 @@ const problem = createSlice({
       ...state,
       problemType: selected,
     }),
+    resetProblem: (state) => ({ ...state, ...initialState }),
   },
 });
 

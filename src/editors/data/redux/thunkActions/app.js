@@ -63,10 +63,13 @@ export const saveBlock = ({ content, returnToUnit, onClose }) => (dispatch) => {
   dispatch(requests.saveBlock({
     content,
     onSuccess: (response) => {
-      dispatch(actions.app.setSaveResponse(response));
       if (onClose) {
+        dispatch(actions.app.resetEditor(response));
+        dispatch(actions.video.resetVideo(response));
+        dispatch(actions.problem.resetProblem(response));
         onClose();
       } else {
+        dispatch(actions.app.setSaveResponse(response));
         returnToUnit();
       }
     },

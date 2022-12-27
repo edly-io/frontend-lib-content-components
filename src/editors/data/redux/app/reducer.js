@@ -46,6 +46,7 @@ const app = createSlice({
     initializeEditor: (state) => ({ ...state, editorInitialized: true }),
     setAssets: (state, { payload }) => ({ ...state, assets: payload }),
     setCourseDetails: (state, { payload }) => ({ ...state, courseDetails: payload }),
+    resetEditor: (state) => ({ ...state, ...initialState }),
   },
 });
 

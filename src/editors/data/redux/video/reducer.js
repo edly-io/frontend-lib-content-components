@@ -49,6 +49,9 @@ const video = createSlice({
     load: (state, { payload }) => ({
       ...payload,
     }),
+    resetVideo: (state) => ({
+      ...state, ...initialState,
+    }),
   },
 });
 
