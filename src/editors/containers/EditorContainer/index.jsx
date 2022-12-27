@@ -54,7 +54,7 @@ export const EditorContainer = ({
 EditorContainer.defaultProps = {
   onClose: null,
   validateEntry: null,
-  shouldGreyoutHeader: true,
+  shouldGreyoutHeader: false,
 };
 EditorContainer.propTypes = {
   children: PropTypes.node.isRequired,
