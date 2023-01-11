@@ -47,6 +47,7 @@ export const Editor = ({
     </div>
   );
 };
+
 Editor.defaultProps = {
   blockId: null,
   learningContextId: null,
