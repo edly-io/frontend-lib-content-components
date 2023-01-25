@@ -15,12 +15,9 @@ export const returnUrl = ({ studioEndpointUrl, unitUrl, learningContextId }) => 
   return unitUrl ? unit({ studioEndpointUrl, unitUrl }) : '';
 };
 
-export const block = ({ studioEndpointUrl, blockId }) => {
-  if (blockId.startsWith('lb:')) {
-    return `${studioEndpointUrl}/api/libraries/v2/${blockId}/data/`;
-  }
-  return `${studioEndpointUrl}/xblock/${blockId}`;
-};
+export const block = ({ studioEndpointUrl, blockId }) => (
+  `${studioEndpointUrl}/xblock/${blockId}`
+);
 
 export const blockAncestor = ({ studioEndpointUrl, blockId }) => (
   `${block({ studioEndpointUrl, blockId })}?fields=ancestorInfo`
@@ -56,6 +53,14 @@ export const downloadVideoHandoutUrl = ({ studioEndpointUrl, handout }) => (
 
 export const courseDetailsUrl = ({ studioEndpointUrl, learningContextId }) => (
   `${studioEndpointUrl}/settings/details/${learningContextId}`
+);
+
+export const checkTranscriptsForImport = ({ studioEndpointUrl, parameters }) => (
+  `${studioEndpointUrl}/transcripts/check?data=${parameters}`
+);
+
+export const replaceTranscript = ({ studioEndpointUrl, parameters }) => (
+  `${studioEndpointUrl}/transcripts/replace?data=${parameters}`
 );
 
 export const courseAdvanceSettings = ({ studioEndpointUrl, learningContextId }) => (

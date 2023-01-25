@@ -7,27 +7,34 @@ import messages from '../messages';
 import TypeRow from './TypeRow';
 
 export const TypeCard = ({
+  answers,
+  correctAnswerCount,
   problemType,
   updateField,
+  updateAnswer,
   // inject
   intl,
 }) => {
-  const problemTypeKeysArray = Object.values(ProblemTypeKeys);
-  const filterBlocks = [ProblemTypeKeys.NUMERIC, ProblemTypeKeys.ADVANCED];
+  const problemTypeKeysArray = Object.values(ProblemTypeKeys).filter(key => key !== ProblemTypeKeys.ADVANCED);
+
+  if (problemType === ProblemTypeKeys.ADVANCED) { return null; }
 
   return (
     <SettingsOption
       title={intl.formatMessage(messages.typeSettingTitle)}
       summary={ProblemTypes[problemType].title}
     >
-      {problemTypeKeysArray.filter(type => !filterBlocks.includes(type)).map((typeKey, i) => (
+      {problemTypeKeysArray.map((typeKey, i) => (
         <TypeRow
+          answers={answers}
+          correctAnswerCount={correctAnswerCount}
           key={typeKey}
           typeKey={typeKey}
           label={ProblemTypes[typeKey].title}
           selected={typeKey !== problemType}
           lastRow={(i + 1) === problemTypeKeysArray.length}
           updateField={updateField}
+          updateAnswer={updateAnswer}
         />
       ))}
     </SettingsOption>
@@ -35,9 +42,19 @@ export const TypeCard = ({
 };
 
 TypeCard.propTypes = {
-  intl: intlShape.isRequired,
+  answers: PropTypes.arrayOf(PropTypes.shape({
+    correct: PropTypes.bool,
+    id: PropTypes.string,
+    selectedFeedback: PropTypes.string,
+    title: PropTypes.string,
+    unselectedFeedback: PropTypes.string,
+  })).isRequired,
+  correctAnswerCount: PropTypes.number.isRequired,
   problemType: PropTypes.string.isRequired,
   updateField: PropTypes.func.isRequired,
+  updateAnswer: PropTypes.func.isRequired,
+  // injected
+  intl: intlShape.isRequired,
 };
 
 export default injectIntl(TypeCard);

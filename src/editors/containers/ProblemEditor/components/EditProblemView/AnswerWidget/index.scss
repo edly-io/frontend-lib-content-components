@@ -1,11 +1,20 @@
-.problem-answer {
-    padding: 12px;
-    color: #00262B;
-    .problem-answer-title {
-        font-weight: bold;
-    }
+.answer-option {
+  .answer-option-textarea {
+    textarea {
+      border: none;
+      resize: none;
 
-    .problem-answer-description {
-        font-size: 0.9rem;
+      &:active, &:hover, &:focus, &:focus-visible {
+        border: none;
+        border-right: none;
+        border-left: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      &:focus, &:hover {
+        border-bottom: 1px solid #000;
+      }
     }
+  }
 }

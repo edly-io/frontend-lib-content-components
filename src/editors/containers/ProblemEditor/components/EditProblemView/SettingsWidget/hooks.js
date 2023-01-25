@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import _ from 'lodash-es';
 import * as module from './hooks';
 import messages from './messages';
-import { ShowAnswerTypesKeys } from '../../../../../data/constants/problem';
+import { ProblemTypeKeys, ShowAnswerTypesKeys } from '../../../../../data/constants/problem';
 
 export const state = {
   showAdvanced: (val) => useState(val),
@@ -73,9 +73,18 @@ export const hintsRowHooks = (id, hints, updateSettings) => {
     updateSettings({ hints: modifiedHints });
   };
 
+  const handleEmptyHint = (event) => {
+    const { value } = event.target;
+    if (value === '') {
+      const modifiedHints = hints.filter((hint) => (hint.id !== id));
+      updateSettings({ hints: modifiedHints });
+    }
+  };
+
   return {
     handleChange,
     handleDelete,
+    handleEmptyHint,
   };
 };
 
@@ -113,13 +122,13 @@ export const resetCardHooks = (updateSettings) => {
 
 export const scoringCardHooks = (scoring, updateSettings) => {
   const handleMaxAttemptChange = (event) => {
-    let unlimitedAttempts = true;
+    let unlimitedAttempts = false;
     let attemptNumber = parseInt(event.target.value);
     if (_.isNaN(attemptNumber)) {
+      attemptNumber = null;
+      unlimitedAttempts = true;
+    } else if (attemptNumber < 0) {
       attemptNumber = 0;
-    }
-    if (attemptNumber > 0) {
-      unlimitedAttempts = false;
     }
     updateSettings({ scoring: { ...scoring, attempts: { number: attemptNumber, unlimited: unlimitedAttempts } } });
   };
@@ -172,7 +181,6 @@ export const showAnswerCardHooks = (showAnswer, updateSettings) => {
 };
 
 export const timerCardHooks = (updateSettings) => ({
-
   handleChange: (event) => {
     let time = parseInt(event.target.value);
     if (_.isNaN(time)) {
@@ -182,12 +190,36 @@ export const timerCardHooks = (updateSettings) => ({
   },
 });
 
-export const typeRowHooks = (typeKey, updateField) => {
+export const typeRowHooks = ({
+  answers,
+  correctAnswerCount,
+  typeKey,
+  updateField,
+  updateAnswer,
+}) => {
   const onClick = () => {
+    if (typeKey === ProblemTypeKeys.SINGLESELECT || typeKey === ProblemTypeKeys.DROPDOWN) {
+      if (correctAnswerCount > 1) {
+        answers.forEach(answer => {
+          updateAnswer({ ...answer, correct: false });
+        });
+      }
+    }
     updateField({ problemType: typeKey });
   };
-
   return {
     onClick,
   };
+};
+
+export const confirmSwitchToAdvancedEditor = ({
+  switchToAdvancedEditor,
+  setConfirmOpen,
+}) => {
+  switchToAdvancedEditor();
+  setConfirmOpen(false);
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
 };

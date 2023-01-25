@@ -2,7 +2,8 @@ import { actions, selectors } from '..';
 import { removeItemOnce } from '../../../utils';
 import * as requests from './requests';
 import * as module from './video';
-import { valueFromDuration } from '../../../containers/VideoEditor/components/VideoSettingsModal/components/duration';
+import { valueFromDuration } from '../../../containers/VideoEditor/components/VideoSettingsModal/components/DurationWidget/hooks';
+import { parseYoutubeId } from '../../services/cms/api';
 
 export const loadVideoData = () => (dispatch, getState) => {
   const state = getState();
@@ -10,10 +11,10 @@ export const loadVideoData = () => (dispatch, getState) => {
   const courseLicenseData = state.app.courseDetails.data ? state.app.courseDetails.data : {};
   const studioView = state.app.studioView?.data?.html;
   const {
-    videoSource,
     videoId,
+    videoUrl,
     fallbackVideos,
-  } = module.determineVideoSource({
+  } = module.determineVideoSources({
     edxVideoId: rawVideoData.edx_video_id,
     youtubeId: rawVideoData.youtube_id_1_0,
     html5Sources: rawVideoData.html5_sources,
@@ -26,7 +27,7 @@ export const loadVideoData = () => (dispatch, getState) => {
   });
 
   dispatch(actions.video.load({
-    videoSource,
+    videoSource: videoUrl || '',
     videoId,
     fallbackVideos,
     allowVideoDownloads: rawVideoData.download_video,
@@ -60,35 +61,39 @@ export const loadVideoData = () => (dispatch, getState) => {
       allowThumbnailUpload: response.data.allowThumbnailUpload,
     })),
   }));
+  const youTubeId = parseYoutubeId(videoUrl);
+  if (youTubeId) {
+    dispatch(requests.checkTranscriptsForImport({
+      videoId,
+      youTubeId,
+      onSuccess: (response) => {
+        if (response.data.command === 'import') {
+          dispatch(actions.video.updateField({
+            allowTranscriptImport: true,
+          }));
+        }
+      },
+    }));
+  }
 };
 
-export const determineVideoSource = ({
+export const determineVideoSources = ({
   edxVideoId,
   youtubeId,
   html5Sources,
 }) => {
-  // videoSource should be the edx_video_id, the youtube url or the first fallback url in that order.
-  // If we are falling back to the first fallback url, remove it from the list of fallback urls for display.
   const youtubeUrl = `https://youtu.be/${youtubeId}`;
-  const videoId = edxVideoId || '';
-  let videoSource = '';
-  let fallbackVideos = [];
+  let videoUrl;
+  let fallbackVideos;
   if (youtubeId) {
-    // videoSource = youtubeUrl;
-    // fallbackVideos = html5Sources;
-    [videoSource, fallbackVideos] = [youtubeUrl, html5Sources];
-  } else if (edxVideoId) {
-    // fallbackVideos = html5Sources;
-    fallbackVideos = html5Sources;
+    [videoUrl, fallbackVideos] = [youtubeUrl, html5Sources];
   } else if (Array.isArray(html5Sources) && html5Sources[0]) {
-    // videoSource = html5Sources[0];
-    // fallbackVideos = html5Sources.slice(1);
-    [videoSource, fallbackVideos] = [html5Sources[0], html5Sources.slice(1)];
+    [videoUrl, fallbackVideos] = [html5Sources[0], html5Sources.slice(1)];
   }
   return {
-    videoSource,
-    videoId,
-    fallbackVideos,
+    videoId: edxVideoId || '',
+    videoUrl: videoUrl || '',
+    fallbackVideos: fallbackVideos || [],
   };
 };
 
@@ -224,6 +229,30 @@ export const uploadHandout = ({ file }) => (dispatch) => {
 
 // Transcript Thunks:
 
+export const importTranscript = () => (dispatch, getState) => {
+  const state = getState();
+  const { transcripts, videoSource } = state.video;
+  // Remove the placeholder '' from the unset language from the list of transcripts.
+  const transcriptsPlaceholderRemoved = (transcripts === []) ? transcripts : removeItemOnce(transcripts, '');
+
+  dispatch(requests.importTranscript({
+    youTubeId: parseYoutubeId(videoSource),
+    onSuccess: (response) => {
+      dispatch(actions.video.updateField({
+        transcripts: [
+          ...transcriptsPlaceholderRemoved,
+          'en'],
+      }));
+
+      if (selectors.video.videoId(state) === '') {
+        dispatch(actions.video.updateField({
+          videoId: response.data.edx_video_id,
+        }));
+      }
+    },
+  }));
+};
+
 export const uploadTranscript = ({ language, file }) => (dispatch, getState) => {
   const state = getState();
   const { transcripts, videoId } = state.video;
@@ -304,10 +333,11 @@ export const replaceTranscript = ({ newFile, newFilename, language }) => (dispat
 
 export default {
   loadVideoData,
-  determineVideoSource,
+  determineVideoSources,
   parseLicense,
   saveVideoData,
   uploadThumbnail,
+  importTranscript,
   uploadTranscript,
   deleteTranscript,
   updateTranscriptLanguage,

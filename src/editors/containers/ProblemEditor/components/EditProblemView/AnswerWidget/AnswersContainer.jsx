@@ -1,26 +1,28 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Button } from '@edx/paragon';
-import { Add } from '@edx/paragon/icons';
 import { FormattedMessage } from '@edx/frontend-platform/i18n';
 
 import messages from './messages';
-import { initializeAnswerContainer } from '../../../hooks';
+import { useAnswerContainer, isSingleAnswerProblem } from './hooks';
 import { actions, selectors } from '../../../../../data/redux';
 import { answerOptionProps } from '../../../../../data/services/cms/types';
 import AnswerOption from './AnswerOption';
+import Button from '../../../../../sharedComponents/Button';
 
 export const AnswersContainer = ({
   problemType,
   // Redux
   answers,
   addAnswer,
+  updateField,
 }) => {
-  const { hasSingleAnswer } = initializeAnswerContainer(problemType);
+  const hasSingleAnswer = isSingleAnswerProblem(problemType);
+
+  useAnswerContainer({ answers, problemType, updateField });
 
   return (
-    <div>
+    <div className="answers-container border border-light-700 rounded py-4 pl-4 pr-3">
       {answers.map((answer) => (
         <AnswerOption
           key={answer.id}
@@ -29,9 +31,7 @@ export const AnswersContainer = ({
         />
       ))}
       <Button
-        className="my-3 ml-2"
-        iconBefore={Add}
-        variant="tertiary"
+        variant="add"
         onClick={addAnswer}
       >
         <FormattedMessage {...messages.addAnswerButtonText} />
@@ -44,6 +44,7 @@ AnswersContainer.propTypes = {
   problemType: PropTypes.string.isRequired,
   answers: PropTypes.arrayOf(answerOptionProps).isRequired,
   addAnswer: PropTypes.func.isRequired,
+  updateField: PropTypes.func.isRequired,
 };
 
 export const mapStateToProps = (state) => ({
@@ -52,6 +53,7 @@ export const mapStateToProps = (state) => ({
 
 export const mapDispatchToProps = {
   addAnswer: actions.problem.addAnswer,
+  updateField: actions.problem.updateField,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(AnswersContainer);

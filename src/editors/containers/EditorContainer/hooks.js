@@ -1,9 +1,12 @@
 import { useSelector } from 'react-redux';
 
+import { useState } from 'react';
 import { RequestKeys } from '../../data/constants/requests';
 import { selectors } from '../../data/redux';
 import * as appHooks from '../../hooks';
+import * as module from './hooks';
 import analyticsEvt from '../../data/constants/analyticsEvt';
+import { StrictDict } from '../../utils';
 
 export const {
   navigateCallback,
@@ -11,9 +14,11 @@ export const {
   saveBlock,
 } = appHooks;
 
-export const handleSaveClicked = ({
-  dispatch, getContent, validateEntry, onClose,
-}) => {
+export const state = StrictDict({
+  isCancelConfirmModalOpen: (val) => useState(val),
+});
+
+export const handleSaveClicked = ({ dispatch, getContent, validateEntry }) => {
   const destination = useSelector(selectors.app.returnUrl);
   const analytics = useSelector(selectors.app.analytics);
 
@@ -23,10 +28,18 @@ export const handleSaveClicked = ({
     destination,
     dispatch,
     validateEntry,
-    onClose,
   });
 };
-export const handleCancelClicked = ({ onClose }) => {
+export const cancelConfirmModalToggle = () => {
+  const [isCancelConfirmOpen, setIsOpen] = module.state.isCancelConfirmModalOpen(false);
+  return {
+    isCancelConfirmOpen,
+    openCancelConfirmModal: () => setIsOpen(true),
+    closeCancelConfirmModal: () => setIsOpen(false),
+  };
+};
+
+export const handleCancel = ({ onClose }) => {
   if (onClose) {
     return onClose;
   }
@@ -37,10 +50,6 @@ export const handleCancelClicked = ({ onClose }) => {
   });
 };
 export const isInitialized = () => useSelector(selectors.app.isInitialized);
-export const saveFailed = () => useSelector((state) => (
-  selectors.requests.isFailed(state, { requestKey: RequestKeys.saveBlock })
-));
-
-export const savePending = () => useSelector((state) => (
-  selectors.requests.isPending(state, { requestKey: RequestKeys.saveBlock })
+export const saveFailed = () => useSelector((rootState) => (
+  selectors.requests.isFailed(rootState, { requestKey: RequestKeys.saveBlock })
 ));

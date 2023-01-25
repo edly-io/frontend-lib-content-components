@@ -28,21 +28,28 @@ jest.mock('./requests', () => ({
   uploadTranscript: (args) => ({ uploadTranscript: args }),
   getTranscriptFile: (args) => ({ getTranscriptFile: args }),
   updateTranscriptLanguage: (args) => ({ updateTranscriptLanguage: args }),
+  checkTranscriptsForImport: (args) => ({ checkTranscriptsForImport: args }),
+  importTranscript: (args) => ({ importTranscript: args }),
 }));
 
 jest.mock('../../../utils', () => ({
   removeItemOnce: (args) => (args),
 }));
 
+jest.mock('../../services/cms/api', () => ({
+  parseYoutubeId: (args) => (args),
+}));
+
 const thunkActionsKeys = keyStore(thunkActions);
 
-const mockLanguage = 'na';
+const mockLanguage = 'en';
 const mockFile = 'soMEtRANscRipT';
 const mockFilename = 'soMEtRANscRipT.srt';
 const mockThumbnail = 'sOMefILE';
 const mockThumbnailResponse = { data: { image_url: 'soMEimAGEUrL' } };
 const thumbnailUrl = 'soMEimAGEUrL';
 const mockAllowThumbnailUpload = { data: { allowThumbnailUpload: 'soMEbOolEAn' } };
+const mockAllowTranscriptImport = { data: { command: 'import' } };
 
 const testMetadata = {
   download_track: 'dOWNlOAdTraCK',
@@ -63,7 +70,7 @@ const testState = {
   originalThumbnail: null,
   videoId: 'soMEvIDEo',
 };
-const testUpload = { transcripts: ['la', 'na'] };
+const testUpload = { transcripts: ['la', 'en'] };
 const testReplaceUpload = {
   file: mockFile,
   language: mockLanguage,
@@ -89,9 +96,11 @@ describe('video thunkActions', () => {
   });
   describe('loadVideoData', () => {
     let dispatchedLoad;
+    let dispatchedAction1;
+    let dispatchedAction2;
     beforeEach(() => {
-      jest.spyOn(thunkActions, thunkActionsKeys.determineVideoSource).mockReturnValue({
-        videoSource: 'videOsOurce',
+      jest.spyOn(thunkActions, thunkActionsKeys.determineVideoSources).mockReturnValue({
+        videoUrl: 'videOsOurce',
         videoId: 'videOiD',
         fallbackVideos: 'fALLbACKvIDeos',
       });
@@ -108,14 +117,18 @@ describe('video thunkActions', () => {
         testMetadata.transcripts,
       );
       thunkActions.loadVideoData()(dispatch, getState);
-      [[dispatchedLoad], [dispatchedAction]] = dispatch.mock.calls;
+      [[dispatchedLoad], [dispatchedAction1], [dispatchedAction2]] = dispatch.mock.calls;
     });
     afterEach(() => {
       jest.restoreAllMocks();
     });
     it('dispatches allowThumbnailUpload action', () => {
       expect(dispatchedLoad).not.toEqual(undefined);
-      expect(dispatchedAction.allowThumbnailUpload).not.toEqual(undefined);
+      expect(dispatchedAction1.allowThumbnailUpload).not.toEqual(undefined);
+    });
+    it('dispatches checkTranscriptsForImport action', () => {
+      expect(dispatchedLoad).not.toEqual(undefined);
+      expect(dispatchedAction2.checkTranscriptsForImport).not.toEqual(undefined);
     });
     it('dispatches actions.video.load', () => {
       expect(dispatchedLoad.load).toEqual({
@@ -151,75 +164,94 @@ describe('video thunkActions', () => {
     });
     it('dispatches actions.video.updateField on success', () => {
       dispatch.mockClear();
-      dispatchedAction.allowThumbnailUpload.onSuccess(mockAllowThumbnailUpload);
+      dispatchedAction1.allowThumbnailUpload.onSuccess(mockAllowThumbnailUpload);
       expect(dispatch).toHaveBeenCalledWith(actions.video.updateField({
         allowThumbnailUpload: mockAllowThumbnailUpload.data.allowThumbnailUpload,
       }));
+      dispatch.mockClear();
+
+      dispatchedAction2.checkTranscriptsForImport.onSuccess(mockAllowTranscriptImport);
+      expect(dispatch).toHaveBeenCalledWith(actions.video.updateField({
+        allowTranscriptImport: true,
+      }));
     });
   });
-  describe('determineVideoSource', () => {
+  describe('determineVideoSources', () => {
     const edxVideoId = 'EDxviDEoiD';
     const youtubeId = 'yOuTuBEiD';
     const youtubeUrl = `https://youtu.be/${youtubeId}`;
     const html5Sources = ['htmLOne', 'hTMlTwo', 'htMLthrEE'];
+    describe('when edx id, youtube id and source values are null', () => {
+      it('returns empty strings for ids and an empty array for sources', () => {
+        expect(thunkActions.determineVideoSources({
+          edxVideoId: null,
+          youtubeId: null,
+          html5Sources: null,
+        })).toEqual({
+          videoUrl: '',
+          videoId: '',
+          fallbackVideos: [],
+        });
+      });
+    });
     describe('when there is an edx video id, youtube id and html5 sources', () => {
-      it('returns the youtube id for video source and html5 sources for fallback videos', () => {
-        expect(thunkActions.determineVideoSource({
+      it('returns all three with the youtube id wrapped in url', () => {
+        expect(thunkActions.determineVideoSources({
           edxVideoId,
           youtubeId,
           html5Sources,
         })).toEqual({
-          videoSource: youtubeUrl,
+          videoUrl: youtubeUrl,
           videoId: edxVideoId,
           fallbackVideos: html5Sources,
         });
       });
     });
-    describe('when there is an edx video id', () => {
+    describe('when there is only an edx video id', () => {
       it('returns the edx video id for video source', () => {
-        expect(thunkActions.determineVideoSource({
+        expect(thunkActions.determineVideoSources({
           edxVideoId,
           youtubeId: '',
           html5Sources: '',
         })).toEqual({
-          videoSource: '',
+          videoUrl: '',
           videoId: edxVideoId,
-          fallbackVideos: '',
+          fallbackVideos: [],
         });
       });
     });
     describe('when there is no edx video id', () => {
       it('returns the youtube url for video source and html5 sources for fallback videos', () => {
-        expect(thunkActions.determineVideoSource({
+        expect(thunkActions.determineVideoSources({
           edxVideoId: '',
           youtubeId,
           html5Sources,
         })).toEqual({
-          videoSource: youtubeUrl,
+          videoUrl: youtubeUrl,
           videoId: '',
           fallbackVideos: html5Sources,
         });
       });
     });
     describe('when there is no edx video id and no youtube id', () => {
-      it('returns the first html5 source for video source and the rest for fallback videos', () => {
-        expect(thunkActions.determineVideoSource({
+      it('returns the first html5 source for video url and the rest for fallback videos', () => {
+        expect(thunkActions.determineVideoSources({
           edxVideoId: '',
           youtubeId: '',
           html5Sources,
         })).toEqual({
-          videoSource: 'htmLOne',
+          videoUrl: 'htmLOne',
           videoId: '',
           fallbackVideos: ['hTMlTwo', 'htMLthrEE'],
         });
       });
       it('returns the html5 source for video source and an array with 2 empty values for fallback videos', () => {
-        expect(thunkActions.determineVideoSource({
+        expect(thunkActions.determineVideoSources({
           edxVideoId: '',
           youtubeId: '',
           html5Sources: ['htmlOne'],
         })).toEqual({
-          videoSource: 'htmlOne',
+          videoUrl: 'htmlOne',
           videoId: '',
           fallbackVideos: [],
         });
@@ -227,12 +259,12 @@ describe('video thunkActions', () => {
     });
     describe('when there is no edx video id, no youtube id and no html5 sources', () => {
       it('returns an empty string for video source and an array with 2 empty values for fallback videos', () => {
-        expect(thunkActions.determineVideoSource({
+        expect(thunkActions.determineVideoSources({
           edxVideoId: '',
           youtubeId: '',
           html5Sources: [],
         })).toEqual({
-          videoSource: '',
+          videoUrl: '',
           videoId: '',
           fallbackVideos: [],
         });
@@ -348,6 +380,20 @@ describe('video thunkActions', () => {
     });
     it('dispatches uploadThumbnail action', () => {
       expect(dispatchedAction.uploadThumbnail).not.toEqual(undefined);
+    });
+  });
+  describe('importTranscript', () => {
+    beforeEach(() => {
+      thunkActions.importTranscript()(dispatch, getState);
+      [[dispatchedAction]] = dispatch.mock.calls;
+    });
+    it('dispatches uploadTranscript action', () => {
+      expect(dispatchedAction.importTranscript).not.toEqual(undefined);
+    });
+    it('dispatches actions.video.updateField on success', () => {
+      dispatch.mockClear();
+      dispatchedAction.importTranscript.onSuccess();
+      expect(dispatch).toHaveBeenCalledWith(actions.video.updateField(testUpload));
     });
   });
   describe('deleteTranscript', () => {

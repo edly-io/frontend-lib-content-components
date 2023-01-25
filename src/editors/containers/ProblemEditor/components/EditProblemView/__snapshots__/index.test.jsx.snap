@@ -1,0 +1,58 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EditorProblemView component renders raw editor 1`] = `
+<injectIntl(ShimmedIntlComponent)
+  getContent={[Function]}
+>
+  <div
+    className="editProblemView d-flex flex-row flex-nowrap justify-content-end"
+  >
+    <span
+      className="flex-grow-1"
+    >
+      <RawEditor
+        content={null}
+        editorRef={
+          Object {
+            "current": null,
+          }
+        }
+        lang="xml"
+      />
+    </span>
+    <span
+      className="editProblemView-settingsColumn"
+    >
+      <injectIntl(ShimmedIntlComponent)
+        problemType="advanced"
+      />
+    </span>
+  </div>
+</injectIntl(ShimmedIntlComponent)>
+`;
+
+exports[`EditorProblemView component renders simple view 1`] = `
+<injectIntl(ShimmedIntlComponent)
+  getContent={[Function]}
+>
+  <div
+    className="editProblemView d-flex flex-row flex-nowrap justify-content-end"
+  >
+    <span
+      className="flex-grow-1"
+    >
+      <injectIntl(ShimmedIntlComponent) />
+      <AnswerWidget
+        problemType="multiplechoiceresponse"
+      />
+    </span>
+    <span
+      className="editProblemView-settingsColumn"
+    >
+      <injectIntl(ShimmedIntlComponent)
+        problemType="multiplechoiceresponse"
+      />
+    </span>
+  </div>
+</injectIntl(ShimmedIntlComponent)>
+`;
