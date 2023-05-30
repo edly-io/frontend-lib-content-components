@@ -154,6 +154,9 @@ export const TranscriptWidget = ({
             <FormattedMessage {...messages.addFirstTranscript} />
           </>
         )}
+        <div className="text-primary large font-weight-bold">
+          <FormattedMessage {...messages.fileReplaceDeleteWarning} />
+        </div>
         <div className="border-primary-100 border-top pt-4">
           <Button
             className="text-primary-500 font-weight-bold justify-content-start pl-0"
