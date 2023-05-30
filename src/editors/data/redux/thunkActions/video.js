@@ -250,23 +250,38 @@ export const uploadTranscript = ({ language, file }) => (dispatch, getState) => 
         }));
       }
     },
+    onFailure: () => {
+      const newTranscripts = transcripts.filter(langCode => langCode !== '');
+      dispatch(actions.video.updateField({ transcripts: newTranscripts }));
+    },
   }));
 };
 
 export const deleteTranscript = ({ language }) => (dispatch, getState) => {
   const state = getState();
   const { transcripts, videoId } = state.video;
-  dispatch(requests.deleteTranscript({
-    language,
-    videoId,
-    onSuccess: () => {
-      const updatedTranscripts = transcripts.filter((langCode) => langCode !== language);
-      dispatch(actions.video.updateField({ transcripts: updatedTranscripts }));
-    },
-  }));
+
+  const updateTranscripts = () => {
+    const updatedTranscripts = transcripts.filter((langCode) => langCode !== language);
+    dispatch(actions.video.updateField({ transcripts: updatedTranscripts }));
+  };
+
+  if (language) {
+    dispatch(requests.deleteTranscript({
+      language,
+      videoId,
+      onSuccess: updateTranscripts,
+    }));
+  } else {
+    updateTranscripts();
+  }
 };
 
-export const updateTranscriptLanguage = ({ newLanguageCode, languageBeforeChange }) => (dispatch, getState) => {
+export const updateTranscriptLanguage = ({
+  newLanguageCode,
+  languageBeforeChange,
+  setLocalLang,
+}) => (dispatch, getState) => {
   const state = getState();
   const { video: { transcripts, videoId } } = state;
   selectors.video.getTranscriptDownloadUrl(state);
@@ -284,6 +299,12 @@ export const updateTranscriptLanguage = ({ newLanguageCode, languageBeforeChange
             .filter(transcript => transcript !== languageBeforeChange);
           newTranscripts.push(newLanguageCode);
           dispatch(actions.video.updateField({ transcripts: newTranscripts }));
+        },
+        onFailure: () => {
+          setLocalLang(languageBeforeChange);
+          const newTranscripts = transcripts.filter(langCode => langCode !== languageBeforeChange);
+          dispatch(actions.video.updateField({ transcripts: newTranscripts }));
+          dispatch(actions.video.updateField({ transcripts }));
         },
       }));
     },

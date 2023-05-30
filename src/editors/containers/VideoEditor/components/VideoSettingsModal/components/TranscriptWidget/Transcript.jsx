@@ -52,7 +52,8 @@ export const Transcript = ({
             <Card.Header title={(<FormattedMessage {...messages.deleteConfirmationHeader} />)} />
             <Card.Body>
               <Card.Section>
-                <FormattedMessage {...messages.deleteConfirmationMessage} />
+                <div><FormattedMessage {...messages.deleteConfirmationMessage} /></div>
+                <div><FormattedMessage {...messages.fileReplaceDeleteWarning} /></div>
               </Card.Section>
               <Card.Footer>
                 <Button variant="tertiary" className="mb-2 mb-sm-0" onClick={cancelDelete}>

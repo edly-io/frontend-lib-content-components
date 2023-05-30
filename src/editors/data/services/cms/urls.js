@@ -17,7 +17,7 @@ export const returnUrl = ({ studioEndpointUrl, unitUrl, learningContextId }) => 
 
 export const block = ({ studioEndpointUrl, blockId }) => {
   if (blockId.startsWith('lb:')) {
-    return `${studioEndpointUrl}/api/libraries/v2/${blockId}/data/`;
+    return `${studioEndpointUrl}/api/libraries/v2/${blockId}/data`;
   }
   return `${studioEndpointUrl}/xblock/${blockId}`;
 };
@@ -26,9 +26,12 @@ export const blockAncestor = ({ studioEndpointUrl, blockId }) => (
   `${block({ studioEndpointUrl, blockId })}?fields=ancestorInfo`
 );
 
-export const blockStudioView = ({ studioEndpointUrl, blockId }) => (
-  `${block({ studioEndpointUrl, blockId })}/studio_view`
-);
+export const blockStudioView = ({ studioEndpointUrl, blockId }) => {
+  if (blockId.startsWith('lb:')) {
+    return `${block({ studioEndpointUrl, blockId })}/handler/studio_transcript/translation`;
+  }
+  return `${block({ studioEndpointUrl, blockId })}/studio_view`;
+};
 
 export const courseAssets = ({ studioEndpointUrl, learningContextId }) => (
   `${studioEndpointUrl}/assets/${learningContextId}/?page_size=500`

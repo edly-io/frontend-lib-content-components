@@ -99,6 +99,11 @@ export const messages = {
     defaultMessage: 'Only SRT files can be uploaded. Please select a file ending in .srt to upload.',
     description: 'Message warning users to only upload .srt files',
   },
+  fileReplaceDeleteWarning: {
+    id: 'authoring.videoeditor.transcripts.fileReplaceDeleteWarning',
+    defaultMessage: 'Deleting/replacing transcript file will be done permanently (there is no recovery).',
+    description: 'Message warning users about deleting or replacing transcript',
+  },
 };
 
 export default messages;
