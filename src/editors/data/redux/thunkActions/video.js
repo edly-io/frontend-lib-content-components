@@ -295,9 +295,9 @@ export const updateTranscriptLanguage = ({
         newLanguageCode,
         videoId,
         onSuccess: () => {
-          const newTranscripts = transcripts
-            .filter(transcript => transcript !== languageBeforeChange);
-          newTranscripts.push(newLanguageCode);
+          const newTranscripts = [...transcripts];
+          const index = newTranscripts.indexOf(languageBeforeChange);
+          newTranscripts[index] = newLanguageCode;
           dispatch(actions.video.updateField({ transcripts: newTranscripts }));
         },
         onFailure: () => {
