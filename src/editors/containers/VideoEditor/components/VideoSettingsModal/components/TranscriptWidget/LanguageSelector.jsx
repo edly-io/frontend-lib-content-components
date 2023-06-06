@@ -70,6 +70,7 @@ export const LanguageSelector = ({
           aria-label={intl.formatMessage(messages.languageSelectLabel)}
           defaultValue={language}
           onChange={(e) => onLanguageChange(e)}
+          value={localLang}
         >
           {Object.entries(videoTranscriptLanguages).map(([lang, text]) => {
             if (language === lang) { return (<option value={lang} selected>{text}</option>); }
