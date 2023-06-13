@@ -23,8 +23,8 @@ export const QuestionWidget = ({
         </h1>
         <Editor
           init={{
-            menubar: false,
-            toolbar: false,
+            menubar: true,
+            toolbar: true,
             plugins: ['paste'],
             paste_as_text: true,
             paste_text_sticky: true,
