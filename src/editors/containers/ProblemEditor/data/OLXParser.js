@@ -24,6 +24,28 @@ export const nonQuestionKeys = [
   'demandhint',
 ];
 
+export const responseKeys = [
+  'multiplechoiceresponse',
+  'numericalresponse',
+  'optionresponse',
+  'stringresponse',
+  'choiceresponse',
+  'multiplechoiceresponse',
+  'truefalseresponse',
+  'optionresponse',
+  'numericalresponse',
+  'stringresponse',
+  'customresponse',
+  'symbolicresponse',
+  'coderesponse',
+  'externalresponse',
+  'formularesponse',
+  'schematicresponse',
+  'imageresponse',
+  'annotationresponse',
+  'choicetextresponse',
+];
+
 export class OLXParser {
   constructor(olxString) {
     this.problem = {};
@@ -37,6 +59,22 @@ export class OLXParser {
     if (_.has(this.parsedOLX, 'problem')) {
       this.problem = this.parsedOLX.problem;
     }
+    const questionParserOptions = {
+      ignoreAttributes: false,
+      alwaysCreateTextNode: true,
+      numberParseOptions: {
+        leadingZeros: false,
+        hex: false,
+      },
+      processEntities: true,
+      preserveOrder: true,
+      trimValues: false,
+    };
+
+    const questionParser = new XMLParser(questionParserOptions);
+    const olx = typeof olxString === 'string' ? olxString : '';
+    const decodedOlx = olx.replaceAll('&#160;', ' ');
+    this.tinyQuestionObject = questionParser.parse(decodedOlx);
   }
 
   parseMultipleChoiceAnswers(problemType, widgetName, option) {
@@ -272,6 +310,60 @@ export class OLXParser {
   }
 
   parseQuestions(problemType) {
+    if (problemType === ProblemTypeKeys.MULTISELECT
+     || problemType === ProblemTypeKeys.DROPDOWN
+     || problemType === ProblemTypeKeys.SINGLESELECT) {
+      const { problem } = this.tinyQuestionObject[0];
+
+      let problemArray = null;
+      for (let i = 0; i < problem.length; i++) {
+        const element = problem[i];
+        if (typeof element === 'object' && problemType in element) {
+          problemArray = element[problemType];
+          break;
+        }
+      }
+
+      if (!problemArray) {
+        return '';
+      }
+
+      const questionArray = [];
+
+      problemArray.forEach(tag => {
+        const tagName = Object.keys(tag)[0];
+        if (!nonQuestionKeys.includes(tagName)) {
+          if (tagName === 'script') {
+            throw new Error('Script Tag, reverting to Advanced Editor');
+          }
+          questionArray.push(tag);
+        } else if (responseKeys.includes(tagName)) {
+          /* <label> and <description> tags often are both valid olx as siblings or children of response type tags.
+           They, however, do belong in the question, so we append them to the question.
+          */
+          tag[tagName].forEach(subTag => {
+            const subTagName = Object.keys(subTag)[0];
+            if (subTagName === 'label' || subTagName === 'description') {
+              questionArray.push(subTag);
+            }
+          });
+        }
+      });
+
+      const richTextBuilderOptions = {
+        ignoreAttributes: false,
+        numberParseOptions: {
+          leadingZeros: false,
+          hex: false,
+        },
+        preserveOrder: true,
+        processEntities: false,
+      };
+      const richTextBuilder = new XMLBuilder(richTextBuilderOptions);
+      const questionString = richTextBuilder.build(questionArray);
+      return questionString.replace(/<description>/gm, '<em>').replace(/<\/description>/gm, '</em>');
+    }
+
     const builder = new XMLBuilder();
     const problemObject = _.get(this.problem, problemType);
     let questionObject = {};

@@ -19,7 +19,7 @@ export const problemEditorConfig = ({
     setEditorRef(editor);
   },
   initialValue: question || '',
-  onFocusOut: () => {
+  onBlur: () => {
     const content = editorRef.current.getContent();
     updateQuestion(content);
   },
@@ -29,9 +29,9 @@ export const prepareEditorRef = () => {
   const editorRef = useRef(null);
   const setEditorRef = useCallback((ref) => {
     editorRef.current = ref;
-    editorRef.current.addShortcut('meta+i', '', '');
-    editorRef.current.addShortcut('meta+b', '', '');
-    editorRef.current.addShortcut('meta+u', '', '');
+    // editorRef.current.addShortcut('meta+i', '', '');
+    // editorRef.current.addShortcut('meta+b', '', '');
+    // editorRef.current.addShortcut('meta+u', '', '');
   }, []);
   const [refReady, setRefReady] = module.state.refReady(false);
   useEffect(() => setRefReady(true), [setRefReady]);

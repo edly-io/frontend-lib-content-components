@@ -7,7 +7,7 @@ class ReactStateOLXParser {
     const parserOptions = {
       ignoreAttributes: false,
       alwaysCreateTextNode: true,
-      // preserveOrder: true
+      // preserveOrder: true,
     };
     const builderOptions = {
       ignoreAttributes: false,
@@ -15,8 +15,33 @@ class ReactStateOLXParser {
       suppressBooleanAttributes: false,
       format: true,
     };
+    const questionParserOptions = {
+      ignoreAttributes: false,
+      alwaysCreateTextNode: true,
+      numberParseOptions: {
+        leadingZeros: false,
+        hex: false,
+      },
+      preserveOrder: true,
+      trimValues: false,
+    };
+    const questionBuilderOptions = {
+      ignoreAttributes: false,
+      alwaysCreateTextNode: true,
+      attributeNamePrefix: '@_',
+      suppressBooleanAttributes: false,
+      format: true,
+      numberParseOptions: {
+        leadingZeros: false,
+        hex: false,
+      },
+      preserveOrder: true,
+      trimValues: false,
+    };
     this.parser = new XMLParser(parserOptions);
     this.builder = new XMLBuilder(builderOptions);
+    this.questionParser = new XMLParser(questionParserOptions);
+    this.questionBuilder = new XMLBuilder(questionBuilderOptions);
     this.problemState = problemState.problem;
   }
 
@@ -98,7 +123,25 @@ class ReactStateOLXParser {
 
   addQuestion() {
     const { question } = this.problemState;
-    const questionObject = this.parser.parse(question);
+    const questionObject = this.questionParser.parse(question);
+
+    /* Removes block tags like <p> or <h1> that surround the <label> format.
+      Block tags are required by tinyMCE but have adverse effect on css in studio.
+      */
+    questionObject.forEach((tag, ind) => {
+      const tagName = Object.keys(tag)[0];
+      let label = null;
+      tag[tagName].forEach(subTag => {
+        const subTagName = Object.keys(subTag)[0];
+        if (subTagName === 'label') {
+          label = subTag;
+        }
+      });
+      if (label) {
+        questionObject[ind] = label;
+      }
+    });
+
     return questionObject;
   }
 
@@ -109,13 +152,19 @@ class ReactStateOLXParser {
     const problemObject = {
       problem: {
         [problemType]: {
-          ...question,
           [widget]: widgetObject,
         },
         ...demandhint,
       },
     };
-    return this.builder.build(problemObject);
+
+    const problemString = this.builder.build(problemObject);
+    const questionString = this.questionBuilder.build(question);
+
+    const questionIndex = problemString.indexOf(`<${problemType}>`) + problemType.length + 2;
+    const updatedProblemString = `${problemString.slice(0, questionIndex)}\n${questionString}\n${problemString.slice(questionIndex + 1)}`;
+
+    return updatedProblemString;
   }
 
   buildTextInput() {
