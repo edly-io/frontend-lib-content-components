@@ -25,15 +25,6 @@ export const QuestionWidget = ({
           init={{
             menubar: true,
             toolbar: true,
-            plugins: ['paste'],
-            paste_as_text: true,
-            paste_text_sticky: true,
-            paste_auto_cleanup_on_paste: true,
-            paste_remove_styles: true,
-            paste_remove_styles_if_webkit: true,
-            paste_strip_class_attributes: true,
-            paste_enable_default_filters: false,
-            paste_word_valid_elements: 'p',
             entity_encoding: 'raw',
           }}
           {

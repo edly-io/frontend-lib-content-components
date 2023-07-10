@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react';
+import {
+  useState, useEffect, useRef, useCallback,
+} from 'react';
 import { StrictDict } from '../../../../../utils';
 import * as module from './hooks';
 import { actions } from '../../../../../data/redux';
 
 export const state = StrictDict({
   isFeedbackVisible: (val) => useState(val),
+  refReady: (val) => useState(val),
 });
 
 export const removeAnswer = ({ answer, dispatch }) => () => {
@@ -36,6 +39,32 @@ export const prepareFeedback = (answer) => {
     toggleFeedback,
   };
 };
+
+export const prepareEditorRef = () => {
+  const editorRef = useRef(null);
+  const setEditorRef = useCallback((ref) => {
+    editorRef.current = ref;
+  }, []);
+  const [refReady, setRefReady] = module.state.refReady(false);
+  useEffect(() => setRefReady(true), [setRefReady]);
+  return { editorRef, refReady, setEditorRef };
+};
+
+export const editorConfig = ({
+  setEditorRef,
+  editorRef,
+  initialValue,
+  saveContent,
+}) => ({
+  onInit: (evt, editor) => {
+    setEditorRef(editor);
+  },
+  initialValue: initialValue || '',
+  onBlur: () => {
+    const content = editorRef.current.getContent();
+    saveContent(content);
+  },
+});
 
 export default {
   state, removeAnswer, setAnswer, prepareFeedback,
