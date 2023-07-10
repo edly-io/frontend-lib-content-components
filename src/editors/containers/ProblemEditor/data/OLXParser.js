@@ -312,7 +312,8 @@ export class OLXParser {
   parseQuestions(problemType) {
     if (problemType === ProblemTypeKeys.MULTISELECT
      || problemType === ProblemTypeKeys.DROPDOWN
-     || problemType === ProblemTypeKeys.SINGLESELECT) {
+     || problemType === ProblemTypeKeys.SINGLESELECT
+     || problemType === ProblemTypeKeys.TEXTINPUT) {
       const { problem } = this.tinyQuestionObject[0];
 
       let problemArray = null;

@@ -6,12 +6,22 @@ import {
 } from '@edx/paragon';
 import { AddComment, Delete } from '@edx/paragon/icons';
 import { FormattedMessage, injectIntl, intlShape } from '@edx/frontend-platform/i18n';
+import { Editor } from '@tinymce/tinymce-react';
 
 import messages from './messages';
 import { selectors } from '../../../../../data/redux';
 import { answerOptionProps } from '../../../../../data/services/cms/types';
 import { ProblemTypeKeys } from '../../../../../data/constants/problem';
 import * as hooks from './hooks';
+
+// Enable editor for following problem types for answer and feedback fields respectivly
+const editorAnswerProblemTypes = [ProblemTypeKeys.SINGLESELECT, ProblemTypeKeys.MULTISELECT];
+const editorFeedbackProblemTypes = [
+  ProblemTypeKeys.DROPDOWN,
+  ProblemTypeKeys.MULTISELECT,
+  ProblemTypeKeys.SINGLESELECT,
+  ProblemTypeKeys.TEXTINPUT,
+];
 
 const Checker = ({
   hasSingleAnswer, answer, setAnswer,
@@ -33,25 +43,50 @@ const Checker = ({
 };
 
 const FeedbackControl = ({
-  feedback, onChange, labelMessage, labelMessageBoldUnderline, key, answer, intl,
-}) => (
-  <Form.Group key={key}>
-    <Form.Label className="mb-3">
-      <FormattedMessage
-        {...labelMessage}
-        values={{
-          answerId: answer.id,
-          boldunderline: <b><u><FormattedMessage {...labelMessageBoldUnderline} /></u></b>,
-        }}
-      />
-    </Form.Label>
-    <Form.Control
-      placeholder={intl.formatMessage(messages.feedbackPlaceholder)}
-      value={feedback}
-      onChange={onChange}
-    />
-  </Form.Group>
-);
+  feedback, onChange, labelMessage, labelMessageBoldUnderline, key, answer, intl, problemType,
+}) => {
+  const { editorRef, refReady, setEditorRef } = hooks.prepareEditorRef();
+
+  return (
+    <Form.Group key={key}>
+      <Form.Label className="mb-3">
+        <FormattedMessage
+          {...labelMessage}
+          values={{
+            answerId: answer.id,
+            boldunderline: <b><u><FormattedMessage {...labelMessageBoldUnderline} /></u></b>,
+          }}
+        />
+      </Form.Label>
+
+      { !editorFeedbackProblemTypes.includes(problemType) ? (
+        <Form.Control
+          placeholder={intl.formatMessage(messages.feedbackPlaceholder)}
+          value={feedback}
+          onChange={onChange}
+        />
+      ) : null }
+
+      {refReady && editorFeedbackProblemTypes.includes(problemType) ? (
+        <Editor
+          init={{
+            menubar: true,
+            toolbar: true,
+            placeholder: intl.formatMessage(messages.feedbackPlaceholder),
+          }}
+          {
+            ...hooks.editorConfig({
+              setEditorRef,
+              editorRef,
+              initialValue: feedback,
+              saveContent: onChange,
+            })
+          }
+        />
+      ) : null}
+    </Form.Group>
+  );
+};
 
 export const AnswerOption = ({
   answer,
@@ -65,37 +100,43 @@ export const AnswerOption = ({
   const removeAnswer = hooks.removeAnswer({ answer, dispatch });
   const setAnswer = hooks.setAnswer({ answer, hasSingleAnswer, dispatch });
   const { isFeedbackVisible, toggleFeedback } = hooks.prepareFeedback(answer);
+  const { editorRef, refReady, setEditorRef } = hooks.prepareEditorRef();
+
+  const isEditorField = editorFeedbackProblemTypes.includes(problemType);
 
   const displayFeedbackControl = (answerObject) => {
     if (problemType !== ProblemTypeKeys.MULTISELECT) {
       return FeedbackControl({
         key: `feedback-${answerObject.id}`,
         feedback: answerObject.feedback,
-        onChange: (e) => setAnswer({ feedback: e.target.value }),
+        onChange: (e) => setAnswer({ feedback: isEditorField ? e : e.target.value }),
         labelMessage: messages.selectedFeedbackLabel,
         labelMessageBoldUnderline: messages.selectedFeedbackLabelBoldUnderlineText,
         answer: answerObject,
         intl,
+        problemType,
       });
     }
     return [
       FeedbackControl({
         key: `selectedfeedback-${answerObject.id}`,
         feedback: answerObject.selectedFeedback,
-        onChange: (e) => setAnswer({ selectedFeedback: e.target.value }),
+        onChange: (e) => setAnswer({ selectedFeedback: isEditorField ? e : e.target.value }),
         labelMessage: messages.selectedFeedbackLabel,
         labelMessageBoldUnderline: messages.selectedFeedbackLabelBoldUnderlineText,
         answer: answerObject,
         intl,
+        problemType,
       }),
       FeedbackControl({
         key: `unselectedfeedback-${answerObject.id}`,
         feedback: answerObject.unselectedFeedback,
-        onChange: (e) => setAnswer({ unselectedFeedback: e.target.value }),
+        onChange: (e) => setAnswer({ unselectedFeedback: isEditorField ? e : e.target.value }),
         labelMessage: messages.unSelectedFeedbackLabel,
         labelMessageBoldUnderline: messages.unSelectedFeedbackLabelBoldUnderlineText,
         answer: answerObject,
         intl,
+        problemType,
       }),
     ];
   };
@@ -117,13 +158,33 @@ export const AnswerOption = ({
         </Col>
 
         <Col xs={9}>
-          <Form.Control
-            as="textarea"
-            rows={1}
-            value={answer.title}
-            onChange={(e) => { setAnswer({ title: e.target.value }); }}
-            placeholder={intl.formatMessage(messages.answerTextboxPlaceholder)}
-          />
+          { !editorAnswerProblemTypes.includes(problemType) ? (
+            <Form.Control
+              as="textarea"
+              rows={1}
+              value={answer.title}
+              onChange={(e) => { setAnswer({ title: e.target.value }); }}
+              placeholder={intl.formatMessage(messages.answerTextboxPlaceholder)}
+            />
+          ) : null }
+
+          {refReady && editorAnswerProblemTypes.includes(problemType) ? (
+            <Editor
+              init={{
+                menubar: true,
+                toolbar: true,
+                placeholder: intl.formatMessage(messages.answerTextboxPlaceholder),
+              }}
+              {
+                ...hooks.editorConfig({
+                  setEditorRef,
+                  editorRef,
+                  initialValue: answer.title,
+                  saveContent: (content) => setAnswer({ title: content }),
+                })
+              }
+            />
+          ) : null }
 
           <Collapsible.Body>
             <div className="bg-dark-100 p-4 mt-3">
@@ -172,6 +233,7 @@ FeedbackControl.propTypes = {
   key: PropTypes.string.isRequired,
   answer: answerOptionProps.isRequired,
   intl: intlShape.isRequired,
+  problemType: PropTypes.string.isRequired,
 };
 
 Checker.propTypes = {

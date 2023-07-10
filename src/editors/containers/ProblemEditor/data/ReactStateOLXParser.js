@@ -174,13 +174,21 @@ class ReactStateOLXParser {
     const problemObject = {
       problem: {
         [ProblemTypeKeys.TEXTINPUT]: {
-          ...question,
           ...answerObject,
         },
         ...demandhint,
       },
     };
-    return this.builder.build(problemObject);
+
+    const problemString = this.builder.build(problemObject);
+    const questionString = this.questionBuilder.build(question);
+
+    const re = new RegExp(`<${ProblemTypeKeys.TEXTINPUT}.*>`);
+    const res = problemString.match(re);
+    const questionIndex = res.index + res[0].length + 1;
+    const updatedProblemString = `${problemString.slice(0, questionIndex)}\n${questionString.trim()}\n${problemString.slice(questionIndex + 1)}`;
+
+    return updatedProblemString;
   }
 
   buildTextInputAnswersFeedback() {
