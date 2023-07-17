@@ -7,7 +7,7 @@ import {
   IconButton,
   Form,
 } from '@edx/paragon';
-import { FeedbackOutline, DeleteOutline } from '@edx/paragon/icons';
+import { AddComment, DeleteOutline } from '@edx/paragon/icons';
 import { FormattedMessage, injectIntl, intlShape } from '@edx/frontend-platform/i18n';
 import messages from './messages';
 import { selectors } from '../../../../../data/redux';
@@ -109,10 +109,10 @@ export const AnswerOption = ({
           />
         </Collapsible.Body>
       </div>
-      <div className="d-flex flex-row flex-nowrap">
+      <div className="ml-1 d-flex flex-row flex-nowrap">
         <Collapsible.Trigger aria-label="Toggle feedback" className="btn-icon btn-icon-primary btn-icon-md align-items-center">
           <Icon
-            src={FeedbackOutline}
+            src={AddComment}
             alt={intl.formatMessage(messages.feedbackToggleIconAltText)}
           />
         </Collapsible.Trigger>
