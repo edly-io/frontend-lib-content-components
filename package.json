@@ -1,5 +1,5 @@
 {
-  "name": "@edx/frontend-lib-content-components",
+  "name": "@edly-io/frontend-lib-content-components",
   "version": "1.0.0-semantically-released",
   "description": "A library of high-level components for content handling.",
   "main": "dist/index.js",
@@ -25,17 +25,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/edx/frontend-lib-content-components.git"
+    "url": "git+https://github.com/edly-io/frontend-lib-content-components.git"
   },
-  "author": "edX",
+  "author": "edly",
   "license": "AGPL-3.0",
   "bugs": {
-    "url": "https://github.com/edx/frontend-lib-content-components/issues"
+    "url": "https://github.com/edly-io/frontend-lib-content-components/issues"
   },
   "browserslist": [
     "extends @edx/browserslist-config"
   ],
-  "homepage": "https://github.com/edx/frontend-lib-content-components#readme",
+  "homepage": "https://github.com/edly-io/frontend-lib-content-components#readme",
   "devDependencies": {
     "@edx/browserslist-config": "^1.1.1",
     "@edx/frontend-build": "12.8.27",
