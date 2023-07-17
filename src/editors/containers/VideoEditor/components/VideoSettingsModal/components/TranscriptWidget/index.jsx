@@ -164,6 +164,9 @@ export const TranscriptWidget = ({
               : null}
           </>
         )}
+        <div className="text-primary large font-weight-bold">
+          <FormattedMessage {...messages.fileReplaceDeleteWarning} />
+        </div>
         <div className="mt-2">
           <Button
             className="text-primary-500 font-weight-bold justify-content-start pl-0"

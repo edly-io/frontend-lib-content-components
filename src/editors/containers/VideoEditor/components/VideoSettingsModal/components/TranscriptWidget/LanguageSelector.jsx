@@ -11,7 +11,7 @@ import {
 import { Check } from '@edx/paragon/icons';
 import { connect, useDispatch } from 'react-redux';
 import { injectIntl, intlShape } from '@edx/frontend-platform/i18n';
-import { thunkActions, selectors } from '../../../../../../data/redux';
+import { actions, thunkActions, selectors } from '../../../../../../data/redux';
 import { videoTranscriptLanguages } from '../../../../../../data/constants/video';
 import { FileInput, fileInput } from '../../../../../../sharedComponents/FileInput';
 import messages from './messages';
@@ -30,7 +30,7 @@ export const hooks = {
     // Else: update language
     dispatch(
       thunkActions.video.updateTranscriptLanguage({
-        newLanguageCode: newLang, languageBeforeChange,
+        newLanguageCode: newLang, languageBeforeChange, setLocalLang,
       }),
     );
   },
@@ -43,6 +43,11 @@ export const hooks = {
     }));
   },
 
+  onCancelCallback: ({ dispatch, transcripts }) => () => {
+    const newTranscripts = transcripts.filter(langCode => langCode !== '');
+    dispatch(actions.video.updateField({ transcripts: newTranscripts }));
+  },
+
 };
 
 export const LanguageSelector = ({
@@ -50,21 +55,25 @@ export const LanguageSelector = ({
   language,
   // Redux
   openLanguages, // Only allow those languages not already associated with a transcript to be selected
+  transcripts,
   // intl
   intl,
 
 }) => {
   const [localLang, setLocalLang] = React.useState(language);
-  const input = fileInput({ onAddFile: hooks.addFileCallback({ dispatch: useDispatch(), localLang }) });
+  const input = fileInput({
+    onAddFile: hooks.addFileCallback({ dispatch: useDispatch(), localLang }),
+    onCancel: hooks.onCancelCallback({ dispatch: useDispatch(), transcripts }),
+  });
   const onLanguageChange = module.hooks.onSelectLanguage({
     dispatch: useDispatch(), languageBeforeChange: localLang, setLocalLang, triggerupload: input.click,
   });
 
   const getTitle = () => {
-    if (Object.prototype.hasOwnProperty.call(videoTranscriptLanguages, language)) {
+    if (Object.prototype.hasOwnProperty.call(videoTranscriptLanguages, localLang)) {
       return (
         <ActionRow>
-          {videoTranscriptLanguages[language]}
+          {videoTranscriptLanguages[localLang]}
           <ActionRow.Spacer />
           <Icon className="text-primary-500" src={Check} />
         </ActionRow>
@@ -118,6 +127,7 @@ LanguageSelector.defaultProps = {
 
 LanguageSelector.propTypes = {
   openLanguages: PropTypes.arrayOf(PropTypes.string),
+  transcripts: PropTypes.arrayOf(PropTypes.string).isRequired,
   index: PropTypes.number.isRequired,
   language: PropTypes.string.isRequired,
   intl: intlShape.isRequired,
@@ -125,6 +135,7 @@ LanguageSelector.propTypes = {
 
 export const mapStateToProps = (state) => ({
   openLanguages: selectors.video.openLanguages(state),
+  transcripts: selectors.video.transcripts(state),
 });
 
 export const mapDispatchToProps = {};

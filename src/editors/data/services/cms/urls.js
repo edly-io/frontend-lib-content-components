@@ -30,7 +30,9 @@ export const blockAncestor = ({ studioEndpointUrl, blockId }) => (
 );
 
 export const blockStudioView = ({ studioEndpointUrl, blockId }) => (
-  `${block({ studioEndpointUrl, blockId })}/studio_view`
+  blockId.startsWith('lb:')
+    ? `${block({ studioEndpointUrl, blockId })}/handler/studio_transcript/translation`
+    : `${block({ studioEndpointUrl, blockId })}/studio_view`
 );
 
 export const courseAssets = ({ studioEndpointUrl, learningContextId }) => (

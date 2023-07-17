@@ -117,6 +117,11 @@ const messages = defineMessages({
     defaultMessage: 'We found transcript for this video on YouTube. Would you like to import it now?',
     description: 'Message for import transcript card asking user if they want to import transcript',
   },
+  fileReplaceDeleteWarning: {
+    id: 'authoring.videoeditor.transcripts.fileReplaceDeleteWarning',
+    defaultMessage: 'Deleting/replacing transcript file will be done permanently (there is no recovery).',
+    description: 'Message warning users about deleting or replacing transcript',
+  },
 });
 
 export default messages;
