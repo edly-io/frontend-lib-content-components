@@ -6,7 +6,7 @@ const mapToolbars = toolbars => toolbars.map(toolbar => toolbar.join(' ')).join(
 const pluginConfig = ({ isLibrary, placeholder, editorType }) => {
   const image = isLibrary ? '' : plugins.image;
   const imageTools = isLibrary ? '' : plugins.imagetools;
-  const imageUploadButton = isLibrary ? '' : buttons.imageUploadButton;
+  const imageUploadButton = '';
   const editImageSettings = isLibrary ? '' : buttons.editImageSettings;
   const codePlugin = editorType === 'text' ? plugins.code : '';
   const codeButton = editorType === 'text' ? buttons.code : '';
@@ -50,7 +50,7 @@ const pluginConfig = ({ isLibrary, placeholder, editorType }) => {
           buttons.outdent,
           buttons.indent,
         ],
-        [imageUploadButton, buttons.link, buttons.unlink, buttons.blockQuote, buttons.codeBlock],
+        [plugins.image, imageUploadButton, buttons.link, buttons.unlink, buttons.blockQuote, buttons.codeBlock],
         [buttons.table, buttons.emoticons, buttons.charmap, buttons.hr],
         [buttons.removeFormat, codeButton],
       ]) : false,
@@ -68,7 +68,7 @@ const pluginConfig = ({ isLibrary, placeholder, editorType }) => {
           buttons.bullist,
           buttons.numlist,
         ],
-        [imageUploadButton, buttons.blockQuote, buttons.codeBlock],
+        [plugins.image, imageUploadButton, buttons.blockQuote, buttons.codeBlock],
         [buttons.table, buttons.emoticons, buttons.charmap, buttons.removeFormat],
       ]),
       quickbarsSelectionToolbar: toolbar ? false : mapToolbars([
@@ -80,7 +80,7 @@ const pluginConfig = ({ isLibrary, placeholder, editorType }) => {
           buttons.bullist,
           buttons.numlist,
         ],
-        [imageUploadButton, buttons.blockQuote, buttons.codeBlock],
+        [plugins.image, imageUploadButton, buttons.blockQuote, buttons.codeBlock],
         [buttons.table, buttons.emoticons, buttons.charmap, buttons.removeFormat],
       ]),
       config: {
@@ -88,6 +88,7 @@ const pluginConfig = ({ isLibrary, placeholder, editorType }) => {
         height: '100%',
         menubar: false,
         toolbar_mode: 'sliding',
+        toolbar_persist: true,
         toolbar_sticky: true,
         toolbar_sticky_offset: 76,
         relative_urls: true,
