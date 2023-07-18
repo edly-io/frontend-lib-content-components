@@ -18,7 +18,7 @@ export const Editor = ({
   returnFunction,
 }) => {
   const dispatch = useDispatch();
-  hooks.initializeApp({
+  const data = React.useMemo(() => ({
     dispatch,
     data: {
       blockId,
@@ -27,7 +27,8 @@ export const Editor = ({
       lmsEndpointUrl,
       studioEndpointUrl,
     },
-  });
+  }), [dispatch, blockId, blockType, learningContextId, lmsEndpointUrl, studioEndpointUrl]);
+  hooks.initializeApp(data);
 
   const EditorComponent = supportedEditors[blockType];
   return (

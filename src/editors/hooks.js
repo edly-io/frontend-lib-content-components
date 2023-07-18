@@ -22,9 +22,13 @@ export const navigateCallback = ({
   destination,
   analyticsEvent,
   analytics,
+  onClose,
 }) => (response) => {
   if (process.env.NODE_ENV !== 'development' && analyticsEvent && analytics) {
     sendTrackEvent(analyticsEvent, analytics);
+  }
+  if (onClose) {
+    onClose();
   }
   if (returnFunction) {
     returnFunction()(response);
@@ -42,6 +46,7 @@ export const saveBlock = ({
   dispatch,
   returnFunction,
   validateEntry,
+  onClose,
 }) => {
   if (!content) {
     return;
@@ -62,6 +67,7 @@ export const saveBlock = ({
         analyticsEvent: analyticsEvt.editorSaveClick,
         analytics,
         returnFunction,
+        onClose,
       }),
     ));
   }
