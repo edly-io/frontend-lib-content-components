@@ -13,7 +13,7 @@ module.exports = createConfig('webpack-dev', {
       'node_modules',
     ],
     alias: {
-      '@edx/frontend-lib-content-components': path.resolve(__dirname, 'src'),
+      '@edly-io/frontend-lib-content-components': path.resolve(__dirname, 'src'),
     },
   },
 });
