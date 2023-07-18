@@ -27,6 +27,7 @@ export const EditorContainer = ({
   const isInitialized = hooks.isInitialized();
   const { isCancelConfirmOpen, openCancelConfirmModal, closeCancelConfirmModal } = hooks.cancelConfirmModalToggle();
   const handleCancel = hooks.handleCancel({ onClose, returnFunction });
+  const isSaving = hooks.savePending();
   return (
     <div
       className="position-relative zindex-0"
@@ -69,13 +70,14 @@ export const EditorContainer = ({
       </ModalDialog.Body>
       <EditorFooter
         clearSaveFailed={hooks.clearSaveError({ dispatch })}
-        disableSave={!isInitialized}
+        disableSave={!isInitialized || isSaving}
         onCancel={openCancelConfirmModal}
         onSave={hooks.handleSaveClicked({
           dispatch,
           getContent,
           validateEntry,
           returnFunction,
+          onClose,
         })}
         saveFailed={hooks.saveFailed()}
       />

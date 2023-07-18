@@ -35,6 +35,7 @@ export const EditProblemView = ({
   analytics,
   // injected
   intl,
+  onClose,
 }) => {
   const dispatch = useDispatch();
   const editorRef = useRef(null);
@@ -52,6 +53,7 @@ export const EditProblemView = ({
         lmsEndpointUrl,
       })}
       returnFunction={returnFunction}
+      onClose={onClose}
     >
       <AlertModal
         title={isAdvancedProblemType ? (
@@ -121,11 +123,13 @@ EditProblemView.defaultProps = {
   assets: null,
   lmsEndpointUrl: null,
   returnFunction: null,
+  onClose: null,
 };
 
 EditProblemView.propTypes = {
   problemType: PropTypes.string.isRequired,
   returnFunction: PropTypes.func,
+  onClose: PropTypes.func,
   // eslint-disable-next-line
   problemState: PropTypes.any.isRequired,
   assets: PropTypes.shape({}),

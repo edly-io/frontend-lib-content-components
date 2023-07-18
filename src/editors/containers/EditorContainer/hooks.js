@@ -25,6 +25,7 @@ export const handleSaveClicked = ({
   getContent,
   validateEntry,
   returnFunction,
+  onClose,
 }) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const destination = useSelector(selectors.app.returnUrl);
@@ -38,6 +39,7 @@ export const handleSaveClicked = ({
     dispatch,
     returnFunction,
     validateEntry,
+    onClose,
   });
 };
 
@@ -70,4 +72,9 @@ export const isInitialized = () => useSelector(selectors.app.isInitialized);
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const saveFailed = () => useSelector((rootState) => (
   selectors.requests.isFailed(rootState, { requestKey: RequestKeys.saveBlock })
+));
+
+// eslint-disable-next-line react-hooks/rules-of-hooks
+export const savePending = () => useSelector((rootState) => (
+  selectors.requests.isPending(rootState, { requestKey: RequestKeys.saveBlock })
 ));
