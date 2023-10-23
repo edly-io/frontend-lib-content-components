@@ -18,7 +18,7 @@ export const ScoringCard = ({
     <SettingsOption
       title={intl.formatMessage(messages.scoringSettingsTitle)}
       summary={intl.formatMessage(messages.scoringSummary,
-        { attempts: scoring.attempts.number, weight: scoring.weight })}
+        { attempts: scoring.attempts.number ? scoring.attempts.number : 0, weight: scoring.weight })}
     >
       <Form.Group>
         <Form.Control

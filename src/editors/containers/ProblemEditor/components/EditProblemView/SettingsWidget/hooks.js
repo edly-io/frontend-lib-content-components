@@ -121,6 +121,10 @@ export const scoringCardHooks = (scoring, updateSettings) => {
     if (attemptNumber > 0) {
       unlimitedAttempts = false;
     }
+    if (!attemptNumber) {
+      // saving 0 attempts will disable submit button
+      attemptNumber = '';
+    }
     updateSettings({ scoring: { ...scoring, attempts: { number: attemptNumber, unlimited: unlimitedAttempts } } });
   };
 
