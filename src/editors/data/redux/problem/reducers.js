@@ -17,7 +17,7 @@ const initialState = {
       weight: 0,
       attempts: {
         unlimited: true,
-        number: 0,
+        number: '',
       },
     },
     hints: [],
